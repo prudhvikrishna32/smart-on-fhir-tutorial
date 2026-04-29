@@ -46,7 +46,7 @@
           var ldl = byCodes('2089-1');
           var temperature = bycodes('8310-5');
   
-
+          alert('you are here');
           var p = defaultPatient();
           p.birthdate = patient.birthDate;
           p.gender = gender;
