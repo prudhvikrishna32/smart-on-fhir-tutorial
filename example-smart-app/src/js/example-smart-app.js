@@ -15,9 +15,12 @@
                     type: 'Observation',
                     query: {
                       code: {
-                        $or: ['http://loinc.org|8302-2', 'http://loinc.org|8462-4',
-                              'http://loinc.org|8480-6', 'http://loinc.org|2085-9',
-                              'http://loinc.org|2089-1', 'http://loinc.org|55284-4']
+                        $or: ['http://loinc.org|8302-2', //body height 
+                              'http://loinc.org|8462-4', //diastollic blood pressure
+                              'http://loinc.org|8480-6', //systollic blood pressure 
+                              'http://loinc.org|2085-9', //HDL
+                              'http://loinc.org|2089-1', //LDL 
+                              'http://loinc.org|55284-4'} //systollic and diastollic
                       }
                     }
                   });
@@ -25,6 +28,7 @@
         $.when(pt, obv).fail(onError);
 
         $.when(pt, obv).done(function(patient, obv) {
+          console.log(obv)
           var byCodes = smart.byCodes(obv, 'code');
           var gender = patient.gender;
 
