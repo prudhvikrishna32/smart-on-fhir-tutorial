@@ -18,7 +18,7 @@
                         $or: ['http://loinc.org|8302-2', //body height
                               'http://loinc.org|2085-9', //HDL
                               'http://loinc.org|2089-1', //LDL 
-                              'http://loinc.org|55284-4'] //systollic and diastollic
+                              'http://loinc.org|85354-9'] //systollic and diastollic
                       }
                     }
                   });
