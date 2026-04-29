@@ -19,7 +19,6 @@
                               'http://loinc.org|2085-9', //HDL
                               'http://loinc.org|2089-1', //LDL 
                               'http://loinc.org|85354-9'] //systollic and diastollic
-                              'http://loinc.org|29463-7'] //systollic and diastollic
                               'http://loinc.org|8310-5'] //temperature
                       }
                     }
