@@ -72,8 +72,8 @@
           p.hdl = getQuantityValueAndUnit(hdl[0]);
           }
 
-          if (typeof temperture[0] != 'undefined') {
-          p.temperature = getQuantityValueAndUnit(temparature[0]);
+          if (typeof temperature[0] != 'undefined') {
+          p.temperature = getQuantityValueAndUnit(temperature[0]);
           } else {
             p.temperature = 'Not available';
           }
