@@ -62,6 +62,8 @@
 
           if (typeof ldl[0] != 'undefined') {
           p.ldl = getQuantityValueAndUnit(ldl[0]);
+          } else {
+            p.ldl = 'Not available';
           }
 
           if (typeof hdl[0] != 'undefined') {
