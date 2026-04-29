@@ -60,8 +60,13 @@
             p.diastolicbp = diastolicbp;
           }
 
-          p.hdl = getQuantityValueAndUnit(hdl[0]);
+          if (typeof ldl[0] != 'undefined') {
           p.ldl = getQuantityValueAndUnit(ldl[0]);
+          }
+
+          if (typeof hdl[0] != 'undefined') {
+          p.hdl = getQuantityValueAndUnit(hdl[0]);
+          }
 
           ret.resolve(p);
         });
