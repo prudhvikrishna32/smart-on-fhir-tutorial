@@ -55,6 +55,9 @@ td {
 .allergy-table th {
   background-color: #d9eaf7;
 }
+.clinical-table tr:nth-child(even) {
+  background-color: #f2f6fb;
+}
 .clinical-table tr:hover{
   background-clor: #e6f0ff;
 }
