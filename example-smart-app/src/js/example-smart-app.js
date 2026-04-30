@@ -43,7 +43,7 @@
       var conditions = smart.patient.api.fetchAll({ type: 'Condition' });
       var carePlans = smart.patient.api.fetchAll({ type: 'CarePlan' });
       var medications = smart.patient.api.fetchAll({ 
-        type: 'MedicationRequest'
+        type: 'MedicationRequest',
         query: {
          patient: smart.patient.id
       }
