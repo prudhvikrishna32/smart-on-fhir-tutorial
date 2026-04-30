@@ -42,7 +42,12 @@
       var allergies = smart.patient.api.fetchAll({ type: 'AllergyIntolerance' });
       var conditions = smart.patient.api.fetchAll({ type: 'Condition' });
       var carePlans = smart.patient.api.fetchAll({ type: 'CarePlan' });
-      var medications = smart.patient.api.fetchAll({ type: 'MedicationRequest' });
+      var medications = smart.patient.api.fetchAll({ 
+        type: 'MedicationRequest'
+        quesry: {
+         patient: smart.patient.id
+      }
+      });
       var procedures = smart.patient.api.fetchAll({ type: 'Procedure' });
       var reports = smart.patient.api.fetchAll({ type: 'DiagnosticReport' });
 
