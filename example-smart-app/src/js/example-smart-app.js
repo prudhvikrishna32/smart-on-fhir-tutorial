@@ -146,38 +146,51 @@
   }
 
   function getAllergies(allergyList) {
-    var allergyHtml = '';
+  var allergyHtml = '';
 
-    allergyList.forEach(function(allergy) {
-      var allergyName = '';
+  allergyList.forEach(function(a) {
+    var name = '';
+    var status = '';
+    var reactions = '';
 
-      if (allergy.code && allergy.code.text) {
-        allergyName = allergy.code.text;
-      } else if (allergy.code && allergy.code.coding && allergy.code.coding[0]) {
-        allergyName = allergy.code.coding[0].display;
-      }
+    // Allergy name
+    if (a.code && a.code.text) {
+      name = a.code.text;
+    } else if (a.code && a.code.coding && a.code.coding[0]) {
+      name = a.code.coding[0].display;
+    }
 
-      var reactionText = '';
+    // Clinical status (active, inactive)
+    if (a.clinicalStatus && a.clinicalStatus.coding && a.clinicalStatus.coding[0]) {
+      status = a.clinicalStatus.coding[0].code;
+    }
 
-      if (allergy.reaction) {
-        allergy.reaction.forEach(function(reaction) {
-          if (reaction.manifestation) {
-            reaction.manifestation.forEach(function(manifestation) {
-              if (manifestation.text) {
-                reactionText += manifestation.text + ' ';
-              } else if (manifestation.coding && manifestation.coding[0]) {
-                reactionText += manifestation.coding[0].display + ' ';
-              }
-            });
-          }
-        });
-      }
+    // Reactions
+    if (a.reaction) {
+      a.reaction.forEach(function(r) {
+        if (r.manifestation) {
+          r.manifestation.forEach(function(m) {
+            if (m.text) {
+              reactions += m.text + ', ';
+            } else if (m.coding && m.coding[0]) {
+              reactions += m.coding[0].display + ', ';
+            }
+          });
+        }
+      });
+    }
 
-      allergyHtml += '<tr><td>' + allergyName + '</td><td>' + reactionText + '</td></tr>';
-    });
+    allergyHtml += `
+      <tr>
+        <td>${name}</td>
+        <td>${status}</td>
+        <td>${reactions}</td>
+      </tr>
+    `;
+  });
 
-    return allergyHtml;
-  }
+  return allergyHtml;
+}
 
   window.drawVisualization = function(p) {
     $('#holder').show();
