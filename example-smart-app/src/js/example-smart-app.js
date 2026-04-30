@@ -11,23 +11,32 @@
       if (smart.hasOwnProperty('patient')) {
         var patient = smart.patient;
         var pt = patient.read();
+
         var obv = smart.patient.api.fetchAll({
-                    type: 'Observation',
-                    query: {
-                      code: {
-                        $or: ['http://loinc.org|8302-2', //body height
-                              'http://loinc.org|2085-9', //HDL
-                              'http://loinc.org|2089-1', //LDL 
-                              'http://loinc.org|85354-9', //systollic and diastollic
-                              'http://loinc.org|8310-5'] //temperature
-                      }
-                    }
-                  });
+          type: 'Observation',
+          query: {
+            code: {
+              $or: [
+                'http://loinc.org|8302-2', // body height
+                'http://loinc.org|2085-9', // HDL
+                'http://loinc.org|2089-1', // LDL
+                'http://loinc.org|85354-9', // systolic and diastolic
+                'http://loinc.org|8310-5' // temperature
+              ]
+            }
+          }
+        });
 
-        $.when(pt, obv).fail(onError);
+        var allergy = smart.patient.api.fetchAll({
+          type: 'AllergyIntolerance'
+        });
 
-        $.when(pt, obv).done(function(patient, obv) {
-          console.log(obv)
+        $.when(pt, obv, allergy).fail(onError);
+
+        $.when(pt, obv, allergy).done(function(patient, obv, allergy) {
+          console.log(obv);
+          console.log(allergy);
+
           var byCodes = smart.byCodes(obv, 'code');
           var gender = patient.gender;
 
@@ -40,13 +49,12 @@
           }
 
           var height = byCodes('8302-2');
-          var systolicbp = getBloodPressureValue(byCodes('85354-9'),'8480-6');
-          var diastolicbp = getBloodPressureValue(byCodes('85354-9'),'8462-4');
+          var systolicbp = getBloodPressureValue(byCodes('85354-9'), '8480-6');
+          var diastolicbp = getBloodPressureValue(byCodes('85354-9'), '8462-4');
           var hdl = byCodes('2085-9');
           var ldl = byCodes('2089-1');
           var temperature = byCodes('8310-5');
-  
-          alert('you are here');
+
           var p = defaultPatient();
           p.birthdate = patient.birthDate;
           p.gender = gender;
@@ -54,7 +62,7 @@
           p.lname = lname;
           p.height = getQuantityValueAndUnit(height[0]);
 
-          if (typeof systolicbp != 'undefined')  {
+          if (typeof systolicbp != 'undefined') {
             p.systolicbp = systolicbp;
           }
 
@@ -63,20 +71,22 @@
           }
 
           if (typeof ldl[0] != 'undefined') {
-          p.ldl = getQuantityValueAndUnit(ldl[0]);
+            p.ldl = getQuantityValueAndUnit(ldl[0]);
           } else {
             p.ldl = 'Not available';
           }
 
           if (typeof hdl[0] != 'undefined') {
-          p.hdl = getQuantityValueAndUnit(hdl[0]);
+            p.hdl = getQuantityValueAndUnit(hdl[0]);
           }
 
           if (typeof temperature[0] != 'undefined') {
-          p.temperature = getQuantityValueAndUnit(temperature[0]);
+            p.temperature = getQuantityValueAndUnit(temperature[0]);
           } else {
             p.temperature = 'Not available';
           }
+
+          p.allergies = getAllergies(allergy);
 
           ret.resolve(p);
         });
@@ -87,7 +97,6 @@
 
     FHIR.oauth2.ready(onReady, onError);
     return ret.promise();
-
   };
 
   function defaultPatient(){
@@ -102,17 +111,20 @@
       ldl: {value: ''},
       hdl: {value: ''},
       temperature: {value: ''},
+      allergies: {value: ''}
     };
   }
 
   function getBloodPressureValue(BPObservations, typeOfPressure) {
     var formattedBPObservations = [];
+
     BPObservations.forEach(function(observation){
       var BP = observation.component.find(function(component){
         return component.code.coding.find(function(coding) {
           return coding.code == typeOfPressure;
         });
       });
+
       if (BP) {
         observation.valueQuantity = BP.valueQuantity;
         formattedBPObservations.push(observation);
@@ -127,10 +139,44 @@
         typeof ob.valueQuantity != 'undefined' &&
         typeof ob.valueQuantity.value != 'undefined' &&
         typeof ob.valueQuantity.unit != 'undefined') {
-          return ob.valueQuantity.value + ' ' + ob.valueQuantity.unit;
+      return ob.valueQuantity.value + ' ' + ob.valueQuantity.unit;
     } else {
       return undefined;
     }
+  }
+
+  function getAllergies(allergyList) {
+    var allergyHtml = '';
+
+    allergyList.forEach(function(allergy) {
+      var allergyName = '';
+
+      if (allergy.code && allergy.code.text) {
+        allergyName = allergy.code.text;
+      } else if (allergy.code && allergy.code.coding && allergy.code.coding[0]) {
+        allergyName = allergy.code.coding[0].display;
+      }
+
+      var reactionText = '';
+
+      if (allergy.reaction) {
+        allergy.reaction.forEach(function(reaction) {
+          if (reaction.manifestation) {
+            reaction.manifestation.forEach(function(manifestation) {
+              if (manifestation.text) {
+                reactionText += manifestation.text + ' ';
+              } else if (manifestation.coding && manifestation.coding[0]) {
+                reactionText += manifestation.coding[0].display + ' ';
+              }
+            });
+          }
+        });
+      }
+
+      allergyHtml += '<tr><td>' + allergyName + '</td><td>' + reactionText + '</td></tr>';
+    });
+
+    return allergyHtml;
   }
 
   window.drawVisualization = function(p) {
@@ -146,6 +192,7 @@
     $('#ldl').html(p.ldl);
     $('#hdl').html(p.hdl);
     $('#temperature').html(p.temperature);
+    $('#allergies').html(p.allergies);
   };
 
 })(window);
